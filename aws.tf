@@ -105,6 +105,23 @@ resource "aws_iam_role_policy_attachment" "poweruser" {
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 
+resource "aws_codebuild_project" "aws-bootstrap" {
+  name         = "aws-bootstrap"
+  service_role = aws_iam_role.deploy.arn
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+  environment {
+    type         = "LINUX_CONTAINER"
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image        = "aws/codebuild/standard:2.0"
+  }
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = ""
+  }
+}
+
 resource "aws_codedeploy_app" "aws-bootstrap" {
   name             = "aws-bootstrap"
   compute_platform = "Server"
@@ -116,7 +133,7 @@ resource "aws_codedeploy_deployment_group" "staging" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
   service_role_arn       = aws_iam_role.deploy.arn
   ec2_tag_filter {
-    key   = "name"
+    key   = "type"
     type  = "KEY_AND_VALUE"
     value = "aws-bootstrap-webserver"
   }
