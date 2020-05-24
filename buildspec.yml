@@ -13,7 +13,7 @@ phases:
 artifacts:
   files:
     - start-service.sh    
-    - stop.service.sh
+    - stop-service.sh
     - server.js
     - package.json
     - appspec.yml
