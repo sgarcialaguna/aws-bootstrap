@@ -46,7 +46,7 @@ resource "aws_security_group" "webserver_sg" {
 
 resource "aws_s3_bucket" "my-code-deploy-bucket" {
   acl           = "private"
-  force_destroy = false
+  force_destroy = true
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -146,6 +146,8 @@ resource "aws_codepipeline" "pipeline" {
     location = aws_s3_bucket.my-code-deploy-bucket.bucket
     type     = "S3"
   }
+  depends_on = [aws_instance.webserver]
+
   stage {
     name = "Source"
 
