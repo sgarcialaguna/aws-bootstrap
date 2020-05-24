@@ -157,10 +157,11 @@ resource "aws_codepipeline" "pipeline" {
       version          = "1"
       output_artifacts = ["source"]
       configuration = {
-        Owner      = "sgarcialaguna"
-        Repo       = "aws-bootstrap"
-        Branch     = "master"
-        OAuthToken = file(".github/aws-bootstrap-token")
+        Owner                = "sgarcialaguna"
+        Repo                 = "aws-bootstrap"
+        Branch               = "master"
+        OAuthToken           = file(".github/aws-bootstrap-token")
+        PollForSourceChanges = false
       }
     }
   }
