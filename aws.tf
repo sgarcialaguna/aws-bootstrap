@@ -11,7 +11,14 @@ resource "aws_instance" "webserver" {
   tags = {
     type = "aws-bootstrap-webserver"
   }
+  iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
 }
+
+resource "aws_iam_instance_profile" "aws-bootstrap-instance-profile" {
+  name = "aws-bootstrap-instance-profile"
+  role = aws_iam_role.aws-bootstrap.name
+}
+
 
 resource "aws_security_group" "webserver_sg" {
   name = "Allow access to webserver"
@@ -133,9 +140,10 @@ resource "aws_codepipeline" "pipeline" {
       version          = "1"
       output_artifacts = ["source"]
       configuration = {
-        Owner  = "sgarcialaguna"
-        Repo   = "aws-bootstrap"
-        Branch = "master"
+        Owner      = "sgarcialaguna"
+        Repo       = "aws-bootstrap"
+        Branch     = "master"
+        OAuthToken = file(".github/aws-bootstrap-token")
       }
     }
   }
@@ -160,13 +168,16 @@ resource "aws_codepipeline" "pipeline" {
     name = "Staging"
 
     action {
-      name             = "Deploy"
-      category         = "Deploy"
-      owner            = "AWS"
-      provider         = "CodeDeploy"
-      input_artifacts  = ["build"]
-      output_artifacts = ["build"]
-      version          = "1"
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["build"]
+      version         = "1"
+      configuration = {
+        ApplicationName     = "aws-bootstrap"
+        DeploymentGroupName = aws_codedeploy_deployment_group.staging.deployment_group_name
+      }
     }
   }
 }
