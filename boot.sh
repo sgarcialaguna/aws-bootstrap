@@ -4,6 +4,10 @@
 exec > /tmp/userdata.log 2>&1
 # Update all packages
 yum -y update
+yum install -y ruby
+wget https://aws-codedeploy-eu-central-1.s3.amazonaws.com/latest/install -O /home/ec2-user/install-codedeployagent.sh
+chmod +x /home/ec2-user/install-codedeployagent.sh
+/home/ec2-user/install-codedeployagent.sh auto
 cat > /tmp/install_script.sh << EOF 
 # START
 echo "Setting up NodeJS Environment"
@@ -19,11 +23,6 @@ nvm install v12.7.0
 nvm use v12.7.0
 
 npm install -g yarn
- 
-# Download latest code, unzip it into /home/ec2-user/app
-wget https://github.com/sgarcialaguna/aws-bootstrap/archive/master.zip
-unzip master.zip
-mv aws-bootstrap-master app
     
 # Create log directory
 mkdir -p /home/ec2-user/app/logs

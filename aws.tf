@@ -8,6 +8,9 @@ resource "aws_instance" "webserver" {
   security_groups = ["${aws_security_group.webserver_sg.name}"]
   key_name        = "default"
   user_data       = file("boot.sh")
+  tags = {
+    type = "aws-bootstrap-webserver"
+  }
 }
 
 resource "aws_security_group" "webserver_sg" {
@@ -94,3 +97,77 @@ resource "aws_iam_role_policy_attachment" "poweruser" {
   role       = aws_iam_role.deploy.name
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
+
+resource "aws_codedeploy_app" "aws-bootstrap" {
+  name             = "aws-bootstrap"
+  compute_platform = "Server"
+}
+
+resource "aws_codedeploy_deployment_group" "staging" {
+  deployment_group_name  = "staging"
+  app_name               = aws_codedeploy_app.aws-bootstrap.name
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+  service_role_arn       = aws_iam_role.deploy.arn
+  ec2_tag_filter {
+    key   = "name"
+    type  = "KEY_AND_VALUE"
+    value = "aws-bootstrap-webserver"
+  }
+}
+
+resource "aws_codepipeline" "pipeline" {
+  name     = "aws-bootstrap"
+  role_arn = aws_iam_role.deploy.arn
+  artifact_store {
+    location = aws_s3_bucket.my-code-deploy-bucket.bucket
+    type     = "S3"
+  }
+  stage {
+    name = "Source"
+
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
+      version          = "1"
+      output_artifacts = ["source"]
+      configuration = {
+        Owner  = "sgarcialaguna"
+        Repo   = "aws-bootstrap"
+        Branch = "master"
+      }
+    }
+  }
+  stage {
+    name = "Build"
+
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["source"]
+      output_artifacts = ["build"]
+      version          = "1"
+
+      configuration = {
+        ProjectName = "aws-bootstrap"
+      }
+    }
+  }
+  stage {
+    name = "Staging"
+
+    action {
+      name             = "Deploy"
+      category         = "Deploy"
+      owner            = "AWS"
+      provider         = "CodeDeploy"
+      input_artifacts  = ["build"]
+      output_artifacts = ["build"]
+      version          = "1"
+    }
+  }
+}
+
