@@ -2,17 +2,40 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-resource "aws_instance" "webserver" {
-  ami             = "ami-076431be05aaf8080"
-  instance_type   = "t2.micro"
-  security_groups = ["${aws_security_group.webserver_sg.name}"]
-  key_name        = "default"
-  user_data       = file("boot.sh")
+
+resource "aws_launch_template" "webserver" {
+  name          = "webserver"
+  image_id      = "ami-076431be05aaf8080"
+  instance_type = "t2.micro"
+  key_name      = "default"
+  user_data     = filebase64("boot.sh")
   tags = {
     type = "aws-bootstrap-webserver"
   }
-  iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
+  #iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
+  security_group_names = ["${aws_security_group.webserver_sg.name}"]
 }
+
+resource "aws_instance" "instance" {
+  ami                  = aws_launch_template.webserver.image_id
+  instance_type        = aws_launch_template.webserver.instance_type
+  key_name             = aws_launch_template.webserver.key_name
+  user_data            = aws_launch_template.webserver.user_data
+  tags                 = aws_launch_template.webserver.tags
+  iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
+  security_groups      = aws_launch_template.webserver.security_group_names
+}
+
+resource "aws_instance" "instance2" {
+  ami                  = aws_launch_template.webserver.image_id
+  instance_type        = aws_launch_template.webserver.instance_type
+  key_name             = aws_launch_template.webserver.key_name
+  user_data            = aws_launch_template.webserver.user_data
+  tags                 = aws_launch_template.webserver.tags
+  iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
+  security_groups      = aws_launch_template.webserver.security_group_names
+}
+
 
 resource "aws_iam_instance_profile" "aws-bootstrap-instance-profile" {
   name = "aws-bootstrap-instance-profile"
@@ -146,7 +169,6 @@ resource "aws_codepipeline" "pipeline" {
     location = aws_s3_bucket.my-code-deploy-bucket.bucket
     type     = "S3"
   }
-  depends_on = [aws_instance.webserver]
 
   stage {
     name = "Source"

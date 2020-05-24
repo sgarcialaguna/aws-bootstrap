@@ -4,7 +4,7 @@
 exec > /tmp/userdata.log 2>&1
 # Update all packages
 yum -y update
-yum install -y ruby
+yum install -y ruby jq
 wget https://aws-codedeploy-eu-central-1.s3.amazonaws.com/latest/install -O /home/ec2-user/install-codedeployagent.sh
 chmod +x /home/ec2-user/install-codedeployagent.sh
 /home/ec2-user/install-codedeployagent.sh auto
@@ -26,11 +26,6 @@ npm install -g yarn
     
 # Create log directory
 mkdir -p /home/ec2-user/app/logs
-    
-# Run server
-cd app
-yarn install
-yarn start
 EOF
 
 chown ec2-user:ec2-user /tmp/install_script.sh && chmod a+x /tmp/install_script.sh
