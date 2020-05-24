@@ -7,7 +7,7 @@ phases:
   pre_build:
     commands:
       - yarn install
-  builds:
+  build:
     commands:
       - yarn build
 artifacts:
