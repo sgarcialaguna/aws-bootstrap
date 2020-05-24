@@ -19,16 +19,6 @@ resource "aws_lb_listener" "listener_80" {
   }
 }
 
-resource "aws_lb_listener" "listener_8081" {
-  load_balancer_arn = aws_lb.loadbalancer.arn
-  port              = 8081
-  protocol          = "HTTP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group.arn
-  }
-}
-
 resource "aws_lb_target_group" "target_group" {
   target_type = "instance"
   port        = 8081
