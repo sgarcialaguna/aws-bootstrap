@@ -5,7 +5,7 @@ files:
     destination: /home/ec2-user/app/release
 permissions:
   - object: /home/ec2-user/app/release
-    pattern "**"
+    pattern: "**"
     owner: ec2-user
     group: ec2-user
 hooks:
