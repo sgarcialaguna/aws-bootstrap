@@ -25,11 +25,7 @@ resource "aws_codedeploy_deployment_group" "staging" {
   app_name               = aws_codedeploy_app.aws-bootstrap.name
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
   service_role_arn       = aws_iam_role.deploy.arn
-  ec2_tag_filter {
-    key   = "type"
-    type  = "KEY_AND_VALUE"
-    value = "aws-bootstrap-webserver"
-  }
+  autoscaling_groups     = [aws_autoscaling_group.webserver.id]
 }
 
 resource "aws_codepipeline" "pipeline" {

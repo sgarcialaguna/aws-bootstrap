@@ -33,16 +33,6 @@ resource "aws_lb_target_group" "target_group" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "target_group_attachment1" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = aws_instance.instance.id
-}
-
-resource "aws_lb_target_group_attachment" "target_group_attachment2" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = aws_instance.instance2.id
-}
-
 resource "aws_launch_template" "webserver" {
   name          = "webserver"
   image_id      = "ami-076431be05aaf8080"
@@ -52,6 +42,8 @@ resource "aws_launch_template" "webserver" {
   tags = {
     type = "aws-bootstrap-webserver"
   }
-  #iam_instance_profile = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
-  security_group_names = [aws_security_group.webserver_sg.name]
+  vpc_security_group_ids = [aws_security_group.webserver_sg.id]
+  iam_instance_profile {
+    name = aws_iam_instance_profile.aws-bootstrap-instance-profile.name
+  }
 }
