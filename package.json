@@ -5,8 +5,7 @@
   "author": "Santiago Garcia <santiago.garcia@posteo.de>",
   "license": "MIT",
   "scripts": {
-    "start": "node ./node_modules/pm2/bin/pm2 start ./server.js --name hello_aws --log ../logs/ap.log",
-    "stop": "node ./node_modules/pm2/bin/pm2 stop hello_aws",
+    "start": "node server.js",
     "build": "echo 'Building...'"
   },
   "dependencies": {
