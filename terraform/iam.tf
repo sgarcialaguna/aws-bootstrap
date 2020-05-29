@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "instance-assume-role-policy" {
 resource "aws_iam_role" "aws-bootstrap" {
   name               = "aws-bootstrap"
   assume_role_policy = data.aws_iam_policy_document.instance-assume-role-policy.json
-  description        = "Allow access to CodeDeploy"
+  description        = "Allow access to CodeDeploy and ECR"
 }
 
 resource "aws_iam_role_policy_attachment" "code_deploy" {
@@ -28,6 +28,11 @@ resource "aws_iam_role_policy_attachment" "code_deploy" {
 resource "aws_iam_role_policy_attachment" "cloudwatch" {
   role       = aws_iam_role.aws-bootstrap.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ecr" {
+  role       = aws_iam_role.aws-bootstrap.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 data "aws_iam_policy_document" "deployment-assume-role-policy" {

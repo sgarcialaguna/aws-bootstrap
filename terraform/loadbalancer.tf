@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "target_group" {
 
 resource "aws_launch_template" "webserver" {
   name          = "webserver"
-  image_id      = "ami-076431be05aaf8080"
+  image_id      = "ami-0bce3fe782b5b6394"
   instance_type = "t2.micro"
   key_name      = "default"
   user_data     = filebase64("boot.sh")

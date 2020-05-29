@@ -1,5 +1,2 @@
 #!/bin/bash -xe
-source /home/ec2-user/.bash_profile
-[ -d "/home/ec2-user/app/release" ] && \
-cd /home/ec2-user/app/release && \
-npm stop
+docker stop 061199822233.dkr.ecr.eu-central-1.amazonaws.com/aws_bootstrap:latest || true
