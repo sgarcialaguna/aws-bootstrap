@@ -11,6 +11,7 @@ resource "aws_s3_bucket" "my-code-deploy-bucket" {
 }
 
 resource "aws_s3_bucket" "aws-bootstrap-scripts" {
+  bucket        = "sgarcia-aws-bootstrap-scripts"
   acl           = "private"
   force_destroy = true
   versioning {
